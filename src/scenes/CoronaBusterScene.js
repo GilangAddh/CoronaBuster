@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import FallingObject from "../ui/FallingObject";
 export default class CoronaBusterScene extends Phaser.Scene {
   constructor() {
     super("corona-buster-scene");
@@ -11,6 +12,9 @@ export default class CoronaBusterScene extends Phaser.Scene {
     this.player = undefined;
     this.speed = 100;
     this.cursor = undefined;
+
+    this.enemies = undefined;
+    this.enemySpeed = 50;
   }
 
   preload() {
@@ -23,6 +27,7 @@ export default class CoronaBusterScene extends Phaser.Scene {
       frameWidth: 66,
       frameHeight: 66,
     });
+    this.load.image("enemy", "images/enemy.png");
   }
 
   create() {
@@ -44,6 +49,20 @@ export default class CoronaBusterScene extends Phaser.Scene {
     this.player = this.createPlayer();
 
     this.cursor = this.input.keyboard.createCursorKeys();
+
+    //enemy
+    this.enemies = this.physics.add.group({
+      classType: FallingObject,
+      maxSize: 10,
+      runChildUpdate: true,
+    });
+
+    this.time.addEvent({
+      delay: Phaser.Math.Between(1000, 5000),
+      callback: this.spawnEnemy,
+      callbackScope: this,
+      loop: true,
+    });
   }
 
   update(time) {
@@ -175,5 +194,18 @@ export default class CoronaBusterScene extends Phaser.Scene {
       }),
     });
     return player;
+  }
+
+  spawnEnemy() {
+    const config = {
+      speed: 30,
+      rotation: 0.1,
+    };
+    // @ts-ignore
+    const enemy = this.enemies.get(0, 0, "enemy", config);
+    const positionX = Phaser.Math.Between(50, 350);
+    if (enemy) {
+      enemy.spawn(positionX);
+    }
   }
 }
