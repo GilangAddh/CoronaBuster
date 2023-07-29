@@ -19,6 +19,12 @@ export default class CoronaBusterScene extends Phaser.Scene {
 
     this.lasers = undefined;
     this.lastFired = 10;
+
+    this.scoreLabel = undefined;
+    this.score = 0;
+
+    this.lifeLabel = undefined;
+    this.life = 3;
   }
 
   preload() {
@@ -85,7 +91,36 @@ export default class CoronaBusterScene extends Phaser.Scene {
       this.lasers,
       this.hitEnemy,
       null,
-      true
+      this
+    );
+
+    //score
+    this.scoreLabel = this.add
+      .text(10, 10, "Score", {
+        fontSize: "16px",
+        //@ts-ignore
+        fill: "black",
+        backgroundColor: "white",
+      })
+      .setDepth(1);
+
+    //Life
+    this.lifeLabel = this.add
+      .text(10, 30, "Life", {
+        fontSize: "16px",
+        //@ts-ignore
+        fill: "black",
+        backgroundColor: "white",
+      })
+      .setDepth(1);
+
+    // Overlaps player
+    this.physics.add.overlap(
+      this.player,
+      this.enemies,
+      this.decreaseLife,
+      null,
+      this
     );
   }
 
@@ -105,6 +140,9 @@ export default class CoronaBusterScene extends Phaser.Scene {
     });
 
     this.movePlayer(this.player, time);
+
+    this.scoreLabel.setText("Score : " + this.score);
+    this.lifeLabel.setText("Life : " + this.life);
   }
 
   createButton() {
@@ -244,5 +282,18 @@ export default class CoronaBusterScene extends Phaser.Scene {
   hitEnemy(laser, enemy) {
     laser.die();
     enemy.die();
+    this.score += 10;
+  }
+
+  decreaseLife(player, enemy) {
+    enemy.die();
+    this.life--;
+    if (this.life == 2) {
+      player.setTint(0xff0000);
+    } else if (this.life == 1) {
+      player.setTint(0xff0000).setAlpha(0.2);
+    } else if (this.life == 0) {
+      this.scene.start("over-scene", { score: this.score });
+    }
   }
 }
