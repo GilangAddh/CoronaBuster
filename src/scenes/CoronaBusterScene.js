@@ -266,7 +266,10 @@ export default class CoronaBusterScene extends Phaser.Scene {
       this.player.anims.play("turn");
     }
 
-    if (this.shoot || (this.cursor.space.isDown && time > this.lastFired)) {
+    if (
+      (this.shoot && time > this.lastFired) ||
+      (this.cursor.space.isDown && time > this.lastFired)
+    ) {
       const laser = this.lasers.get(0, 0, "laser");
       if (laser) {
         laser.fire(this.player.x, this.player.y);
